@@ -333,7 +333,7 @@ angular.module('dndLists', [])
 
                 var eventTime = 0;
                 element.on('dragover', function(event){
-                    if((Date.now() - eventTime) > 50) {
+                    if((Date.now() - eventTime) > 100) {
                         eventTime = Date.now();
                         return handleDragOver(event);
                     }
