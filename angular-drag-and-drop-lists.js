@@ -333,9 +333,19 @@ angular.module('dndLists', [])
 
                 var eventTime = 0;
                 element.on('dragover', function(event){
-                    if((Date.now() - eventTime) > 100) {
+                    if((Date.now() - eventTime) > 50) {
                         eventTime = Date.now();
                         return handleDragOver(event);
+                    }
+                    else {
+                        if (!isDropAllowed(event)) return true;
+                        if (attr.dndDragover && !invokeCallback(attr.dndDragover, event, getPlaceholderIndex())) {
+                            return stopDragover();
+                        }
+                        element.addClass("dndDragover");
+                        event.preventDefault();
+                        event.stopPropagation();
+                        return false;
                     }
                 });
 
