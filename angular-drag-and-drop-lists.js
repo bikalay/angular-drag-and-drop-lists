@@ -335,7 +335,7 @@ angular.module('dndLists', [])
                 element.on('dragover', function(event){
                     event = event.originalEvent || event;
                     if (!isDropAllowed(event)) return true;
-                    if((Date.now() - eventTime) > 300) {
+                    if((Date.now() - eventTime) > 200) {
                         eventTime = Date.now();
                         handleDragOver(event);
                         if (attr.dndDragover && !invokeCallback(attr.dndDragover, event, getPlaceholderIndex())) {
