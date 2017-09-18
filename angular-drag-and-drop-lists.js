@@ -333,20 +333,19 @@ angular.module('dndLists', [])
 
                 var eventTime = 0;
                 element.on('dragover', function(event){
-                    if((Date.now() - eventTime) > 100) {
+                    event = event.originalEvent || event;
+                    if (!isDropAllowed(event)) return true;
+                    if((Date.now() - eventTime) > 300) {
                         eventTime = Date.now();
-                        return handleDragOver(event);
-                    }
-                    else {
-                        if (!isDropAllowed(event)) return true;
+                        handleDragOver(event);
                         if (attr.dndDragover && !invokeCallback(attr.dndDragover, event, getPlaceholderIndex())) {
                             return stopDragover();
                         }
                         element.addClass("dndDragover");
-                        event.preventDefault();
-                        event.stopPropagation();
-                        return false;
                     }
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
                 });
 
                 /**
@@ -425,7 +424,7 @@ angular.module('dndLists', [])
                         if (!element.hasClass("dndDragover")) {
                             placeholder.remove();
                         }
-                    }, 100);
+                    }, 300);
                 });
 
                 /**
