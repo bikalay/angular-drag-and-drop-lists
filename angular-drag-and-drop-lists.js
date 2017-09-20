@@ -7,6 +7,7 @@
  *
  * License: MIT
  */
+var eventTime = 0;
 angular.module('dndLists', [])
 
 /**
@@ -97,7 +98,7 @@ angular.module('dndLists', [])
 
                     // Add CSS classes. See documentation above
                     element.addClass("dndDragging");
-                    $timeout(function() { element.addClass("dndDraggingSource"); }, 0);
+                    $timeout(function() { element.addClass("dndDraggingSource"); }, 100);
 
                     // Workarounds for stupid browsers, see description below
                     dndDropEffectWorkaround.dropEffect = "none";
@@ -270,16 +271,11 @@ angular.module('dndLists', [])
                  */
                 function handleDragOver(event) {
 
-                    event = event.originalEvent || event;
-
-                    if (!isDropAllowed(event)) return true;
-
                     // First of all, make sure that the placeholder is shown
                     // This is especially important if the list is empty
                     if (placeholderNode.parentNode != listNode) {
                         element.append(placeholder);
                     }
-
                     if (event.target !== listNode) {
                         // Try to find the node direct directly below the list node.
                         var listItemNode = event.target;
@@ -322,27 +318,20 @@ angular.module('dndLists', [])
 
                     // At this point we invoke the callback, which still can disallow the drop.
                     // We can't do this earlier because we want to pass the index of the placeholder.
+                }
+
+
+                element.on('dragover', function(event){
+                    event = event.originalEvent || event;
+                    if (!isDropAllowed(event)) return true;
+                    if((Date.now() - eventTime) > 300) {
+                        eventTime = Date.now();
+                        handleDragOver(event);
+                    }
                     if (attr.dndDragover && !invokeCallback(attr.dndDragover, event, getPlaceholderIndex())) {
                         return stopDragover();
                     }
                     element.addClass("dndDragover");
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return false;
-                }
-
-                var eventTime = 0;
-                element.on('dragover', function(event){
-                    event = event.originalEvent || event;
-                    if (!isDropAllowed(event)) return true;
-                    if((Date.now() - eventTime) > 200) {
-                        eventTime = Date.now();
-                        handleDragOver(event);
-                        if (attr.dndDragover && !invokeCallback(attr.dndDragover, event, getPlaceholderIndex())) {
-                            return stopDragover();
-                        }
-                        element.addClass("dndDragover");
-                    }
                     event.preventDefault();
                     event.stopPropagation();
                     return false;
@@ -417,6 +406,7 @@ angular.module('dndLists', [])
                  * is still dragging over the list. If you know a better way of doing this, please tell me!
                  */
                 element.on('dragleave', function(event) {
+                    eventTime = 0;
                     event = event.originalEvent || event;
                     console.log('dragleave');
                     element.removeClass("dndDragover");
@@ -424,7 +414,7 @@ angular.module('dndLists', [])
                         if (!element.hasClass("dndDragover")) {
                             placeholder.remove();
                         }
-                    }, 300);
+                    }, 100);
                 });
 
                 /**
