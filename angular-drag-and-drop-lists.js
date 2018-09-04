@@ -373,6 +373,10 @@ angular.module('dndLists', [])
                     // Insert the object into the array, unless dnd-drop took care of that (returned true).
                     if (transferredObject !== true) {
                         scope.$apply(function() {
+                            const dndConstructor = scope.$eval(attr.dndConstructor);
+                            if(typeof(dndConstructor) === 'function') {
+                                transferredObject = dndConstructor(transferredObject);
+                            }
                             scope.$eval(attr.dndList).splice(index, 0, transferredObject);
                         });
                     }
